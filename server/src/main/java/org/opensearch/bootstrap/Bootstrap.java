@@ -64,6 +64,7 @@ import org.opensearch.monitor.process.ProcessProbe;
 import org.opensearch.node.InternalSettingsPreparer;
 import org.opensearch.node.Node;
 import org.opensearch.node.NodeValidationException;
+import org.opensearch.node.cassandra.NodeSetting;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -77,6 +78,7 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -239,6 +241,12 @@ final class Bootstrap {
             throw new BootstrapException(e);
         }
 
+
+
+
+
+
+        // 初始化一个node节点
         node = new Node(environment) {
             @Override
             protected void validateNodeBeforeAcceptingRequests(
@@ -400,7 +408,7 @@ final class Bootstrap {
             // initialized as we do not want to grant the runtime permission
             // setDefaultUncaughtExceptionHandler
             Thread.setDefaultUncaughtExceptionHandler(new OpenSearchUncaughtExceptionHandler());
-
+            // 初始化安装
             INSTANCE.setup(true, environment);
 
             try {

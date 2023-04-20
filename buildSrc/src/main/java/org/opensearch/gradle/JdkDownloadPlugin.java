@@ -88,6 +88,7 @@ public class JdkDownloadPlugin implements Plugin<Project> {
             Jdk jdk = new Jdk(name, configuration, project.getObjects());
             configuration.defaultDependencies(dependencies -> {
                 jdk.finalizeValues();
+                // 集成jdk下载位置
                 setupRepository(project, jdk);
                 dependencies.add(project.getDependencies().create(dependencyNotation(jdk)));
             });

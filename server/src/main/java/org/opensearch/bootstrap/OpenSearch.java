@@ -55,6 +55,7 @@ import java.util.Locale;
 
 /**
  * This class starts opensearch.
+ * 这个类开启 opensearch
  *
  * @opensearch.internal
  */
@@ -82,6 +83,7 @@ class OpenSearch extends EnvironmentAwareCommand {
 
     /**
      * Main entry point for starting opensearch
+     * 启动opensearch的主要入口点
      */
     public static void main(final String[] args) throws Exception {
         overrideDnsCachePolicyProperties();
@@ -137,6 +139,9 @@ class OpenSearch extends EnvironmentAwareCommand {
         return opensearch.main(args, terminal);
     }
 
+    /**
+     * Runable 启动后，执行方法
+     */
     @Override
     protected void execute(Terminal terminal, OptionSet options, Environment env) throws UserException {
         if (options.nonOptionArguments().isEmpty() == false) {
@@ -177,6 +182,7 @@ class OpenSearch extends EnvironmentAwareCommand {
     void init(final boolean daemonize, final Path pidFile, final boolean quiet, Environment initialEnv) throws NodeValidationException,
         UserException {
         try {
+            // opensearch 服务初始化
             Bootstrap.init(!daemonize, pidFile, quiet, initialEnv);
         } catch (BootstrapException | RuntimeException e) {
             // format exceptions to the console in a special way

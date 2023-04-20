@@ -70,6 +70,7 @@ apply from: 'gradle/run.gradle'
 apply from: 'gradle/missing-javadoc.gradle'
 apply from: 'gradle/code-coverage.gradle'
 
+
 // common maven publishing configuration
 allprojects {
   group = 'org.opensearch'

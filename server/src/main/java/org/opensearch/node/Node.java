@@ -32,6 +32,7 @@
 
 package org.opensearch.node;
 
+import com.fasterxml.jackson.core.JsonEncoding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.util.Constants;
@@ -54,6 +55,7 @@ import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.NoopExtensionsManager;
 import org.opensearch.monitor.fs.FsInfo;
 import org.opensearch.monitor.fs.FsProbe;
+import org.opensearch.node.cassandra.NodeSetting;
 import org.opensearch.search.backpressure.SearchBackpressureService;
 import org.opensearch.search.backpressure.settings.SearchBackpressureSettings;
 import org.opensearch.tasks.TaskResourceTrackingService;
@@ -388,12 +390,20 @@ public class Node implements Closeable {
         final List<Closeable> resourcesToClose = new ArrayList<>(); // register everything we need to release in the case of an error
         boolean success = false;
         try {
+            String cassandraYaml = initialEnvironment.configDir().toString()+"/cassandra.yaml";
+
+            Settings newSettings = NodeSetting.nodeSettings(initialEnvironment.settings(),cassandraYaml);
             Settings tmpSettings = Settings.builder()
-                .put(initialEnvironment.settings())
+                .put(newSettings)
                 .put(Client.CLIENT_TYPE_SETTING_S.getKey(), CLIENT_TYPE)
                 // Enabling shard indexing backpressure node-attribute
                 .put(NODE_ATTRIBUTES.getKey() + SHARD_INDEXING_PRESSURE_ENABLED_ATTRIBUTE_KEY, "true")
                 .build();
+
+            System.out.println("----------启动 node 前的配置-------------");
+            System.out.println(cassandraYaml);
+            System.out.println(initialEnvironment.settings().toString());
+            System.out.println("---------------------------------------");
 
             final JvmInfo jvmInfo = JvmInfo.jvmInfo();
             logger.info(
@@ -447,6 +457,12 @@ public class Node implements Closeable {
             );
 
             final Settings settings = pluginsService.updatedSettings();
+
+
+
+            System.out.println("-------------初始化配置-------");
+            System.out.println(settings.toString());
+            System.out.println("----------------------------");
 
             // Ensure to initialize Feature Flags via the settings from opensearch.yml
             FeatureFlags.initializeFeatureFlags(settings);

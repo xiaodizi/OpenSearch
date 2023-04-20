@@ -50,6 +50,7 @@ import org.opensearch.env.Environment;
 
 /**
  * Prepares internal settings
+ * 准备配置
  *
  * @opensearch.internal
  */
@@ -71,6 +72,7 @@ public class InternalSettingsPreparer {
 
     /**
      * Prepares the settings by gathering all opensearch system properties, optionally loading the configuration settings.
+     * 解析配置文件
      *
      * @param input      the custom settings to use; these are not overwritten by settings in the configuration file
      * @param properties map of properties key/value pairs (usually from the command-line)
