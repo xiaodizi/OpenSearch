@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+echo "-----当前Home目录-----"
+echo $PWD
+
+
+echo "-----------------开启 opensearch 和 cassandra -----------------------"
+echo "正在开启中。。。。"
+nohup $PWD/bin/opensearch -d > ./opensearch.log 2>&1 &
+sleep 10
+nohup $PWD/cassandra/bin/cassandra > ./cassandra.log 2>&1 &
+echo "-------------------------- 开启结束  ---------------------------------"

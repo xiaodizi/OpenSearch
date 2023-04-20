@@ -243,7 +243,7 @@ if (VersionProperties.isOpenSearchSnapshot()) {
   Properties sysProps = System.getProperties();
   // setting this property to false will exclude the sandbox modules from the distribution
   final String enableSandbox = sysProps.getProperty("sandbox.enabled", "true");
-  if(sysProps != null && enableSandbox == "true") {
+  if (sysProps != null && enableSandbox == "true") {
     tasks.withType(NoticeTask).configureEach {
       project(':sandbox:libs').subprojects.each { Project lib ->
         licensesDir lib.file('licenses')
@@ -367,7 +367,7 @@ configure(subprojects.findAll { ['archives', 'packages'].contains(it.name) }) {
         if (BuildParams.isSnapshotBuild()) {
           from(buildExternalTestModulesTaskProvider)
         }
-        if (project.path.startsWith(':distribution:packages') || ['freebsd-x64','linux-x64', 'linux-arm64'].contains(platform)) {
+        if (project.path.startsWith(':distribution:packages') || ['freebsd-x64', 'linux-x64', 'linux-arm64'].contains(platform)) {
           from(buildSystemdModuleTaskProvider)
         }
       }
@@ -465,6 +465,71 @@ configure(subprojects.findAll { ['archives', 'packages'].contains(it.name) }) {
         }
       }
     }
+
+    cassandraBinFiles = {
+      return copySpec {
+        with copySpec {
+          from '../../server/cassandra/build/dist/bin/'
+          into 'cassandra/bin/'
+          eachFile { it.setMode(0755) }
+        }
+      }
+    }
+
+//    cassandraConfFiles = {
+//      return copySpec {
+//        with copySpec {
+//          from '../../server/cassandra/build/dist/conf/'
+//          into 'config/'
+//          exclude 'cassandra.yaml'
+//          eachFile { it.setMode(0755) }
+//        }
+//      }
+//    }
+
+    cassandraBFiles = {
+      return copySpec {
+        with copySpec {
+          from '../../server/cassandra/build/dist/lib/'
+          into 'cassandra/lib/'
+          //exclude {details->'commons-logging-1.2.jar,lang-painless-3.0.0-SNAPSHOT.jar'}
+          duplicatesStrategy 'exclude'
+        }
+      }
+    }
+
+    cassandraPyFiles = {
+      return copySpec {
+        with copySpec {
+          from '../../server/cassandra/build/dist/pylib/'
+          into 'cassandra/pylib/'
+          eachFile {it.setMode(0755)}
+        }
+      }
+    }
+
+
+    cassandraToolsFiles = {
+      return copySpec {
+        with copySpec {
+          from '../../server/cassandra/build/dist/tools/'
+          into 'cassandra/tools/'
+          eachFile { it.setMode(0755)}
+        }
+      }
+    }
+
+    cassandraDocFiles = {
+      return copySpec {
+        with copySpec {
+          from '../../server/cassandra/build/dist/doc/'
+          into 'cassandra/doc/'
+          eachFile { it.setMode(0755)}
+        }
+      }
+    }
+
+
   }
 }
 
@@ -513,62 +578,62 @@ subprojects {
     String footer = "# Built for ${project.name}-${project.version} " +
       "(${distributionType})"
     Map<String, Object> expansions = [
-      'project.name': project.name,
-      'project.version': version,
+      'project.name'                : project.name,
+      'project.version'             : version,
 
-      'path.conf': [
+      'path.conf'                   : [
         'deb': '/etc/opensearch',
         'rpm': '/etc/opensearch',
         'def': '"$OPENSEARCH_HOME"/config'
       ],
-      'path.data': [
+      'path.data'                   : [
         'deb': packagingPathData,
         'rpm': packagingPathData,
         'def': '#path.data: /path/to/data'
       ],
-      'path.env': [
+      'path.env'                    : [
         'deb': '/etc/default/opensearch',
         'rpm': '/etc/sysconfig/opensearch',
         /* There isn't one of these files for tar or zip but its important to
           make an empty string here so the script can properly skip it. */
         'def': 'if [ -z "$OPENSEARCH_PATH_CONF" ]; then OPENSEARCH_PATH_CONF="$OPENSEARCH_HOME"/config; done',
       ],
-      'source.path.env': [
+      'source.path.env'             : [
         'deb': 'source /etc/default/opensearch',
         'rpm': 'source /etc/sysconfig/opensearch',
         'def': 'if [ -z "$OPENSEARCH_PATH_CONF" ]; then OPENSEARCH_PATH_CONF="$OPENSEARCH_HOME"/config; fi',
       ],
-      'path.logs': [
+      'path.logs'                   : [
         'deb': packagingPathLogs,
         'rpm': packagingPathLogs,
         'def': '#path.logs: /path/to/logs'
       ],
-      'loggc': [
+      'loggc'                       : [
         'deb': packagingLoggc,
         'rpm': packagingLoggc,
         'def': 'logs/gc.log'
       ],
 
-      'heap.min': defaultHeapSize,
-      'heap.max': defaultHeapSize,
+      'heap.min'                    : defaultHeapSize,
+      'heap.max'                    : defaultHeapSize,
 
-      'heap.dump.path': [
+      'heap.dump.path'              : [
         'deb': "-XX:HeapDumpPath=/var/lib/opensearch",
         'rpm': "-XX:HeapDumpPath=/var/lib/opensearch",
         'def': "-XX:HeapDumpPath=data"
       ],
 
-      'error.file': [
+      'error.file'                  : [
         'deb': "-XX:ErrorFile=/var/log/opensearch/hs_err_pid%p.log",
         'rpm': "-XX:ErrorFile=/var/log/opensearch/hs_err_pid%p.log",
         'def': "-XX:ErrorFile=logs/hs_err_pid%p.log"
       ],
 
-      'stopping.timeout': [
+      'stopping.timeout'            : [
         'rpm': 86400,
       ],
 
-      'scripts.footer': [
+      'scripts.footer'              : [
         /* Debian needs exit 0 on these scripts so we add it here and preserve
           the pretty footer. */
         'deb': "exit 0\n${footer}",
@@ -582,15 +647,15 @@ subprojects {
         'zip': 'zip'
       ],
 
-      'opensearch.bundled_jdk': [
+      'opensearch.bundled_jdk'      : [
         'def': jdk ? 'true' : 'false'
       ],
 
-      'license.name': [
+      'license.name'                : [
         'deb': 'ASL-2.0'
       ],
 
-      'license.text': [
+      'license.text'                : [
         'deb': licenseText,
       ],
     ]
@@ -632,6 +697,6 @@ subprojects {
   Project subproject = project("${project.path}:${subName}")
   Configuration configuration = configurations.create(subproject.name)
   dependencies {
-    "${configuration.name}" project(path: subproject.path, configuration:'default')
+    "${configuration.name}" project(path: subproject.path, configuration: 'default')
   }
 }
