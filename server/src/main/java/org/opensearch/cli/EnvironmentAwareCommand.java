@@ -113,10 +113,6 @@ public abstract class EnvironmentAwareCommand extends Command {
     // 加载配置文件
     protected final Environment createEnv(final Settings baseSettings, final Map<String, String> settings) throws UserException {
         final String esPathConf = System.getProperty("opensearch.path.conf");
-
-        System.out.println("------------LEI TEST--------------");
-        System.out.println(esPathConf.toString());
-        System.out.println("----------------------------------");
         if (esPathConf == null) {
             throw new UserException(ExitCodes.CONFIG, "the system property [opensearch.path.conf] must be set");
         }

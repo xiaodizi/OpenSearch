@@ -79,6 +79,7 @@ public class NodeSetting {
             .put("network.host", getCassandraYamlByKey("rpc_address", path))
             .put("node.name", getCassandraYamlByKey("rpc_address", path))
             .put("discovery.seed_hosts", getSeedsConfig(path))
+            .put("cluster.initial_cluster_manager_nodes",getSeedsConfig(path))
             .put("cluster.name", getCassandraYamlByKey("cluster_name", path))
             .put("path.home", settings.get("path.home"))
             .put("path.data", settings.get("path.data"))
