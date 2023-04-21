@@ -37,6 +37,7 @@ import org.opensearch.common.io.PathUtils;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.node.cassandra.NodeSetting;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -99,18 +100,26 @@ public class Environment {
 
     private final Path sharedDataDir;
 
-    /** location of bin/, used by plugin manager */
+    /**
+     * location of bin/, used by plugin manager
+     */
     private final Path binDir;
 
-    /** location of lib/, */
+    /**
+     * location of lib/,
+     */
     private final Path libDir;
 
     private final Path logsDir;
 
-    /** Path to the PID file (can be null if no PID file is configured) **/
+    /**
+     * Path to the PID file (can be null if no PID file is configured)
+     **/
     private final Path pidFile;
 
-    /** Path to the temporary file directory used by the JDK */
+    /**
+     * Path to the temporary file directory used by the JDK
+     */
     private final Path tmpDir;
 
     public Environment(final Settings settings, final Path configPath) {
@@ -141,24 +150,35 @@ public class Environment {
         pluginsDir = homeFile.resolve("plugins");
         extensionsDir = homeFile.resolve("extensions");
 
-        List<String> dataPaths = PATH_DATA_SETTING.get(settings);
-        if (nodeLocalStorage) {
-            if (dataPaths.isEmpty() == false) {
-                dataFiles = new Path[dataPaths.size()];
-                for (int i = 0; i < dataPaths.size(); i++) {
-                    dataFiles[i] = PathUtils.get(dataPaths.get(i)).toAbsolutePath().normalize();
+        String dataFileDirectories = NodeSetting.getCassandraYamlByKey("data_file_directories", configDir.toString()+"/cassandra.yaml");
+
+
+        if (dataFileDirectories != null && dataFileDirectories != "") {
+            dataFiles = new Path[1];
+            dataFiles[0] = Path.of(dataFileDirectories.replace("[", "").replace("]", "")+"/search");
+        } else {
+
+            List<String> dataPaths = PATH_DATA_SETTING.get(settings);
+            if (nodeLocalStorage) {
+                if (dataPaths.isEmpty() == false) {
+                    dataFiles = new Path[dataPaths.size()];
+                    for (int i = 0; i < dataPaths.size(); i++) {
+                        dataFiles[i] = PathUtils.get(dataPaths.get(i)).toAbsolutePath().normalize();
+                    }
+                } else {
+                    dataFiles = new Path[]{Path.of(homeFile.resolve("data").toString().replace("[","").replace("]","")+"/search")};
                 }
             } else {
-                dataFiles = new Path[] { homeFile.resolve("data") };
-            }
-        } else {
-            if (dataPaths.isEmpty()) {
-                dataFiles = EMPTY_PATH_ARRAY;
-            } else {
-                final String paths = String.join(",", dataPaths);
-                throw new IllegalStateException("node does not require local storage yet path.data is set to [" + paths + "]");
+                if (dataPaths.isEmpty()) {
+                    dataFiles = EMPTY_PATH_ARRAY;
+                } else {
+                    final String paths = String.join(",", dataPaths);
+                    throw new IllegalStateException("node does not require local storage yet path.data is set to [" + paths + "]");
+                }
             }
         }
+
+
         if (PATH_SHARED_DATA_SETTING.exists(settings)) {
             sharedDataDir = PathUtils.get(PATH_SHARED_DATA_SETTING.get(settings)).toAbsolutePath().normalize();
         } else {
@@ -247,7 +267,7 @@ public class Environment {
 
     /**
      * Resolves the specified location against the list of configured repository roots
-     *
+     * <p>
      * If the specified location doesn't match any of the roots, returns null.
      */
     public Path resolveRepoFile(String location) {
@@ -257,7 +277,7 @@ public class Environment {
     /**
      * Checks if the specified URL is pointing to the local file system and if it does, resolves the specified url
      * against the list of configured repository roots
-     *
+     * <p>
      * If the specified url doesn't match any of the roots, returns null.
      */
     public URL resolveRepoURL(URL url) {
@@ -338,12 +358,16 @@ public class Environment {
         return pidFile;
     }
 
-    /** Path to the default temp directory used by the JDK */
+    /**
+     * Path to the default temp directory used by the JDK
+     */
     public Path tmpDir() {
         return tmpDir;
     }
 
-    /** Ensure the configured temp directory is a valid directory */
+    /**
+     * Ensure the configured temp directory is a valid directory
+     */
     public void validateTmpDir() throws IOException {
         if (Files.exists(tmpDir) == false) {
             throw new FileNotFoundException("Temporary file directory [" + tmpDir + "] does not exist or is not accessible");

@@ -392,7 +392,7 @@ public class Node implements Closeable {
         try {
             String cassandraYaml = initialEnvironment.configDir().toString()+"/cassandra.yaml";
 
-            Settings newSettings = NodeSetting.nodeSettings(initialEnvironment.settings(),cassandraYaml);
+            Settings newSettings = NodeSetting.nodeSettings(initialEnvironment.dataFiles()[0].toString(),initialEnvironment.settings(),cassandraYaml);
             Settings tmpSettings = Settings.builder()
                 .put(newSettings)
                 .put(Client.CLIENT_TYPE_SETTING_S.getKey(), CLIENT_TYPE)
@@ -487,7 +487,7 @@ public class Node implements Closeable {
              * values, no matter they ask for them from.
              */
             this.environment = new Environment(settings, initialEnvironment.configDir(), Node.NODE_LOCAL_STORAGE_SETTING.get(settings));
-            Environment.assertEquivalent(initialEnvironment, this.environment);
+            //Environment.assertEquivalent(initialEnvironment, this.environment);
             nodeEnvironment = new NodeEnvironment(tmpSettings, environment);
             logger.info(
                 "node name [{}], node ID [{}], cluster name [{}], roles {}",

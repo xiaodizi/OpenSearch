@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
-echo "-----当前Home目录-----"
-echo $PWD
+echo "当前Home目录："$PWD
 
-echo "-----------------开启 opensearch 和 cassandra -----------------------"
+
+
+echo "开启 opensearch 和 cassandra -----------------------"
 echo "正在开启中......"
 source "`dirname "$0"`"/opensearch -d &
 sleep 8
 
 num1=`ps -ef | grep 'opensearch' | grep -v grep | wc -l`
-echo $num1
+
 if [ $num1 -eq  0 ]; then  #如果没有该进程，则退出
   echo "opensearch 启动失败......"
   exit
 fi
 
 echo "进程检测完毕，opensearch 启动成功......."
-source "`dirname "$1"`"/cassandra/bin/cassandra &
-echo $PWD
+source "`dirname "$1"`"/cassandra/bin/cassandra
 sleep 10
 num2=`ps -ef | grep 'opensearch' | grep -v grep | wc -l`
 

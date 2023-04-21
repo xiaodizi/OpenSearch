@@ -9,8 +9,6 @@
 package org.opensearch.node.cassandra;
 
 import com.alibaba.fastjson2.JSON;
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.json.JsonWriteContext;
 import org.opensearch.common.settings.Settings;
 import org.yaml.snakeyaml.Yaml;
 
@@ -20,12 +18,6 @@ import java.util.Map;
 
 public class NodeSetting {
 
-    public static void main(String[] args) {
-        String seedsConfig = getSeedsConfig("/Users/lei.fu/java/mca/OpenSearch/build/testclusters/runTask-0/config/cassandra.yaml");
-        if (seedsConfig.equals("127.0.0.1") || seedsConfig.equals("localhost")) {
-            System.out.println(JSON.toJSONString(seedsConfig));
-        }
-    }
 
     /**
      * 获取seeds 配置 转换 opensearch 配置
@@ -61,10 +53,17 @@ public class NodeSetting {
         }
         Yaml yaml = new Yaml();
         Map<String, Object> data = yaml.load(inputStream);
+        if (data.get(key) == null){
+            return null;
+        }
         return data.get(key).toString();
     }
 
-    public static Settings nodeSettings(Settings settings, String path) {
+    public static Settings nodeSettings(String dataPath,Settings settings, String path) {
+        System.out.println("---------------------LEI TEST--------------");
+        System.out.println("dataPath:"+dataPath);
+        System.out.println("settings:"+settings.get("path.data"));
+        System.out.println("-------------------------------------------");
         if (getSeedsConfig(path).equals("127.0.0.1") || getSeedsConfig(path).equals("localhost")) {
             return Settings.builder()
                 .put("network.host", getCassandraYamlByKey("rpc_address", path))
@@ -72,7 +71,7 @@ public class NodeSetting {
                 //.put("discovery.seed_hosts", getSeedsConfig(path))
                 .put("cluster.name", getCassandraYamlByKey("cluster_name", path))
                 .put("path.home", settings.get("path.home"))
-                .put("path.data", settings.get("path.data"))
+                .put("path.data", dataPath+"/search")
                 .build();
         }
         return Settings.builder()
@@ -82,24 +81,7 @@ public class NodeSetting {
             .put("cluster.initial_cluster_manager_nodes",getSeedsConfig(path))
             .put("cluster.name", getCassandraYamlByKey("cluster_name", path))
             .put("path.home", settings.get("path.home"))
-            .put("path.data", settings.get("path.data"))
+            .put("path.data", dataPath+"/search")
             .build();
-    }
-
-    private static String getElasticsearchDataDir() {
-        String cassandra_storage = System.getProperty("OPENSEARCH_HOME", getHomeDir() + File.separator + "data");
-        // 把elastic search 的数据存储到 cassandra 的数据路径下
-        return cassandra_storage + File.separator + "elasticsearch.data";
-    }
-
-
-    public static String getHomeDir() {
-        String cassandra_home = System.getenv("CASSANDRA_HOME");
-        if (cassandra_home == null) {
-            cassandra_home = System.getProperty("cassandra.home", System.getProperty("path.home"));
-            if (cassandra_home == null)
-                throw new IllegalStateException("Cannot start, environnement variable CASSANDRA_HOME and system properties cassandra.home or path.home are null. Please set one of these to start properly.");
-        }
-        return cassandra_home;
     }
 }

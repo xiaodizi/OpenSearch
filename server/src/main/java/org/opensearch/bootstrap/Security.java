@@ -126,6 +126,7 @@ final class Security {
     /**
      * Initializes SecurityManager for the environment
      * Can only happen once!
+     * 初始化环境的SecurityManager只能发生一次！
      * @param environment configuration for generating dynamic permissions
      * @param filterBadDefaults true if we should filter out bad java defaults in the system policy.
      */
@@ -309,6 +310,7 @@ final class Security {
 
     /**
      * Adds access to all configurable paths.
+     * 给文件夹添加权限
      */
     static void addFilePermissions(Permissions policy, Environment environment) throws IOException {
         // read-only dirs
@@ -333,6 +335,7 @@ final class Security {
         final Set<Path> dataFilesPaths = new HashSet<>();
         for (Path path : environment.dataFiles()) {
             addDirectoryPath(policy, Environment.PATH_DATA_SETTING.getKey(), path, "read,readlink,write,delete", false);
+//            addDirectoryPath(policy,Environment.PATH_DATA_SETTING.getKey(),Path.of(path.toString()+"/search"),"read,readlink,write,delete",false);
             /*
              * We have to do this after adding the path because a side effect of that is that the directory is created; the Path#toRealPath
              * invocation will fail if the directory does not already exist. We use Path#toRealPath to follow symlinks and handle issues
