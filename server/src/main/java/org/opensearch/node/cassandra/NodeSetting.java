@@ -60,10 +60,6 @@ public class NodeSetting {
     }
 
     public static Settings nodeSettings(String dataPath,Settings settings, String path) {
-        System.out.println("---------------------LEI TEST--------------");
-        System.out.println("dataPath:"+dataPath);
-        System.out.println("settings:"+settings.get("path.data"));
-        System.out.println("-------------------------------------------");
         if (getSeedsConfig(path).equals("127.0.0.1") || getSeedsConfig(path).equals("localhost")) {
             return Settings.builder()
                 .put("network.host", getCassandraYamlByKey("rpc_address", path))
