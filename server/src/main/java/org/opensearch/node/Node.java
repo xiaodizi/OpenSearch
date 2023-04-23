@@ -56,6 +56,7 @@ import org.opensearch.extensions.NoopExtensionsManager;
 import org.opensearch.monitor.fs.FsInfo;
 import org.opensearch.monitor.fs.FsProbe;
 import org.opensearch.node.cassandra.NodeSetting;
+import org.opensearch.node.cassandra.SnitchProperties;
 import org.opensearch.search.backpressure.SearchBackpressureService;
 import org.opensearch.search.backpressure.settings.SearchBackpressureSettings;
 import org.opensearch.tasks.TaskResourceTrackingService;
@@ -392,7 +393,11 @@ public class Node implements Closeable {
         try {
             String cassandraYaml = initialEnvironment.configDir().toString()+"/cassandra.yaml";
 
-            Settings newSettings = NodeSetting.nodeSettings(initialEnvironment.dataFiles()[0].toString(),initialEnvironment.settings(),cassandraYaml);
+            SnitchProperties snitchProperties=new SnitchProperties(initialEnvironment);
+
+            Settings newSettings = NodeSetting.nodeSettings(initialEnvironment.dataFiles()[0].toString(),
+                initialEnvironment.settings(),
+                cassandraYaml,snitchProperties);
             Settings tmpSettings = Settings.builder()
                 .put(newSettings)
                 .put(Client.CLIENT_TYPE_SETTING_S.getKey(), CLIENT_TYPE)

@@ -59,7 +59,7 @@ public class NodeSetting {
         return data.get(key).toString();
     }
 
-    public static Settings nodeSettings(String dataPath,Settings settings, String path) {
+    public static Settings nodeSettings(String dataPath,Settings settings, String path,SnitchProperties snitchProperties) {
         if (getSeedsConfig(path).equals("127.0.0.1") || getSeedsConfig(path).equals("localhost")) {
             return Settings.builder()
                 .put("network.host", getCassandraYamlByKey("rpc_address", path))
@@ -68,6 +68,7 @@ public class NodeSetting {
                 .put("cluster.name", getCassandraYamlByKey("cluster_name", path))
                 .put("path.home", settings.get("path.home"))
                 .put("path.data", dataPath+"/search")
+                .put("node.attr.rack_id",snitchProperties.get("dc").trim()+"-"+snitchProperties.get("rack").trim())
                 .build();
         }
         return Settings.builder()
@@ -78,6 +79,7 @@ public class NodeSetting {
             .put("cluster.name", getCassandraYamlByKey("cluster_name", path))
             .put("path.home", settings.get("path.home"))
             .put("path.data", dataPath+"/search")
+            .put("node.attr.rack_id",snitchProperties.get("dc").trim()+"-"+snitchProperties.get("rack").trim())
             .build();
     }
 }
