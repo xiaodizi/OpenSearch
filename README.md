@@ -75,6 +75,20 @@
 所有配置，修改config文件夹下的**cassandra.yaml**文件即可。
 
 
+### Rack 冷热集群配置
+需要在cassandra.yaml文件配置，如下项：
+```shell
+# You can use a custom Snitch by setting this to the full class name
+# of the snitch, which will be assumed to be on your classpath.
+endpoint_snitch: SimpleSnitch
+```
+
+修改为：
+```shell
+# You can use a custom Snitch by setting this to the full class name
+# of the snitch, which will be assumed to be on your classpath.
+endpoint_snitch: GossipingPropertyFileSnitch
+```
 
 
 ## Project Resources

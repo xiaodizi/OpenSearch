@@ -220,9 +220,9 @@ JVM_ON_OUT_OF_MEMORY_ERROR_OPT="-XX:OnOutOfMemoryError=kill -9 %p"
 # for more on configuring JMX through firewalls, etc. (Short version:
 # get it working with no firewall first.)
 #
-# Cassandra ships with JMX accessible *only* from localhost.  
+# Cassandra ships with JMX accessible *only* from localhost.
 # To enable remote JMX connections, uncomment lines below
-# with authentication and/or ssl enabled. See https://wiki.apache.org/cassandra/JmxSecurity 
+# with authentication and/or ssl enabled. See https://wiki.apache.org/cassandra/JmxSecurity
 #
 if [ "x$LOCAL_JMX" = "x" ]; then
     LOCAL_JMX=yes
@@ -302,6 +302,8 @@ if [ "x$MX4J_PORT" != "x" ]; then
         JVM_OPTS="$JVM_OPTS -Dmx4jport=$MX4J_PORT"
     fi
 fi
+
+JVM_OPTS="$JVM_OPTS -Dcassandra.ignore_dc=true -Dcassandra.ignore_rack=true"
 
 JVM_OPTS="$JVM_OPTS $JVM_EXTRA_OPTS"
 
