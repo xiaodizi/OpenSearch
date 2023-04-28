@@ -499,7 +499,6 @@ public class MetadataCreateIndexService {
                 indexMetadata.getNumberOfShards(),
                 indexMetadata.getNumberOfReplicas()
             );
-
             indexService.getIndexEventListener().beforeIndexAddedToCluster(indexMetadata.getIndex(), indexMetadata.getSettings());
             return clusterStateCreateIndex(currentState, request.blocks(), indexMetadata, allocationService::reroute, metadataTransformer);
         });

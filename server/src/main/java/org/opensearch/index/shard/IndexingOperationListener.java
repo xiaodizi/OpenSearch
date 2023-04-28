@@ -33,12 +33,14 @@ package org.opensearch.index.shard;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.ParameterizedMessage;
+import org.opensearch.cluster.metadata.IndexMetadata;
 import org.opensearch.index.engine.Engine;
 
 import java.util.List;
 
 /**
  * An indexing listener for indexing, delete, events.
+ * 索引的索引和删除事件监听
  *
  * @opensearch.internal
  */
@@ -46,6 +48,7 @@ public interface IndexingOperationListener {
 
     /**
      * Called before the indexing occurs.
+     * 在索引发生之前调用。
      */
     default Engine.Index preIndex(ShardId shardId, Engine.Index operation) {
         return operation;
@@ -68,6 +71,7 @@ public interface IndexingOperationListener {
 
     /**
      * Called before the delete occurs.
+     * 在删除发生之前调用
      */
     default Engine.Delete preDelete(ShardId shardId, Engine.Delete delete) {
         return delete;
@@ -87,6 +91,9 @@ public interface IndexingOperationListener {
      * related failures
      */
     default void postDelete(ShardId shardId, Engine.Delete delete, Exception ex) {}
+
+
+
 
     /**
      * A Composite listener that multiplexes calls to each of the listeners methods.

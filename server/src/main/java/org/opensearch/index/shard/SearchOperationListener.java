@@ -43,6 +43,7 @@ import java.util.List;
 
 /**
  * An listener for search, fetch and context events.
+ * 搜索、获取和上下文事件的侦听器。
  *
  * @opensearch.internal
  */

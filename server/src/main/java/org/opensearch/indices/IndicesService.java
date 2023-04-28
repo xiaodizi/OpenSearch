@@ -738,6 +738,7 @@ public class IndicesService extends AbstractLifecycleComponent
 
     /**
      * Creates a new {@link IndexService} for the given metadata.
+     * 创建一个新的 indexService 为了元数据
      *
      * @param indexMetadata          the index metadata to create the index for
      * @param builtInListeners       a list of built-in lifecycle {@link IndexEventListener} that should should be used along side with the

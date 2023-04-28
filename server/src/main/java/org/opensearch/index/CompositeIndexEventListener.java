@@ -173,18 +173,6 @@ final class CompositeIndexEventListener implements IndexEventListener {
     }
 
     @Override
-    public void afterIndexCreated(IndexService indexService) {
-        for (IndexEventListener listener : listeners) {
-            try {
-                listener.afterIndexCreated(indexService);
-            } catch (Exception e) {
-                logger.warn("failed to invoke after index created callback", e);
-                throw e;
-            }
-        }
-    }
-
-    @Override
     public void beforeIndexShardCreated(ShardId shardId, Settings indexSettings) {
         for (IndexEventListener listener : listeners) {
             try {
