@@ -87,13 +87,7 @@ if (!isEclipse) {
 
 dependencies {
 
-  // implementation group: 'org.apache.cassandra', name: 'cassandra-clientutil', version: '3.9'
-
-  implementation group: 'com.alibaba.fastjson2', name: 'fastjson2', version: '2.0.28'
-
-//  implementation fileTree(dir: 'lib/',include: '*jar')
-
-
+  api group: 'com.alibaba.fastjson2', name: 'fastjson2', version: '2.0.31'
 
   api project(':libs:opensearch-common')
   api project(':libs:opensearch-core')
@@ -143,6 +137,7 @@ dependencies {
 
   // jna
   api "net.java.dev.jna:jna:${versions.jna}"
+
 
   testImplementation(project(":test:framework")) {
     // tests use the locally compiled version of server

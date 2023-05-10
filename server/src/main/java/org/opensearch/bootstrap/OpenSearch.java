@@ -86,6 +86,8 @@ class OpenSearch extends EnvironmentAwareCommand {
      * 启动opensearch的主要入口点
      */
     public static void main(final String[] args) throws Exception {
+
+
         overrideDnsCachePolicyProperties();
         /*
          * We want the JVM to think there is a security manager installed so that if internal policy decisions that would be based on the
@@ -100,6 +102,7 @@ class OpenSearch extends EnvironmentAwareCommand {
             }
 
         });
+
         LogConfigurator.registerErrorListener();
         final OpenSearch opensearch = new OpenSearch();
         int status = main(args, opensearch, Terminal.DEFAULT);

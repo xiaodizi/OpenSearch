@@ -151,6 +151,4 @@ if (extraProjects.exists()) {
     addSubProjects('', extraProjectDir)
   }
 }
-include 'modules:cdc'
-findProject(':modules:cdc')?.name = 'cdc'
 

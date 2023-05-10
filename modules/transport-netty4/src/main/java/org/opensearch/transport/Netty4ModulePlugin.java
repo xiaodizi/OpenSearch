@@ -33,6 +33,11 @@
 package org.opensearch.transport;
 
 import org.opensearch.Version;
+import org.opensearch.cassandra.CDCListener;
+import org.opensearch.cassandra.CDCPluginSettings;
+import org.opensearch.client.Client;
+import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
+import org.opensearch.cluster.service.ClusterService;
 import org.opensearch.common.SetOnce;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.network.NetworkModule;
@@ -43,18 +48,21 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.BigArrays;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
+import org.opensearch.env.Environment;
+import org.opensearch.env.NodeEnvironment;
 import org.opensearch.http.HttpServerTransport;
 import org.opensearch.http.netty4.Netty4HttpServerTransport;
+import org.opensearch.index.IndexModule;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.plugins.NetworkPlugin;
 import org.opensearch.plugins.Plugin;
+import org.opensearch.repositories.RepositoriesService;
+import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.netty4.Netty4Transport;
+import org.opensearch.watcher.ResourceWatcherService;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class Netty4ModulePlugin extends Plugin implements NetworkPlugin {
@@ -63,6 +71,13 @@ public class Netty4ModulePlugin extends Plugin implements NetworkPlugin {
     public static final String NETTY_HTTP_TRANSPORT_NAME = "netty4";
 
     private final SetOnce<SharedGroupFactory> groupFactory = new SetOnce<>();
+
+
+    List<Setting<?>> settings = new ArrayList<>();
+
+    private final Setting<Boolean> cdcEnableSetting = Setting.boolSetting(CDCPluginSettings.CDC_ENABLED, false,
+        Setting.Property.IndexScope, Setting.Property.Dynamic);
+
 
     @Override
     public List<Setting<?>> getSettings() {
@@ -74,7 +89,8 @@ public class Netty4ModulePlugin extends Plugin implements NetworkPlugin {
             Netty4Transport.NETTY_RECEIVE_PREDICTOR_SIZE,
             Netty4Transport.NETTY_RECEIVE_PREDICTOR_MIN,
             Netty4Transport.NETTY_RECEIVE_PREDICTOR_MAX,
-            Netty4Transport.NETTY_BOSS_COUNT
+            Netty4Transport.NETTY_BOSS_COUNT,
+            cdcEnableSetting
         );
     }
 
@@ -149,4 +165,19 @@ public class Netty4ModulePlugin extends Plugin implements NetworkPlugin {
             return this.groupFactory.get();
         }
     }
+
+
+    @Override
+    public void onIndexModule(IndexModule indexModule) {
+
+        final CDCListener cdcListener = new CDCListener(indexModule);
+        indexModule.addIndexEventListener(cdcListener);
+        indexModule.addIndexOperationListener(cdcListener);
+    }
+
+    @Override
+    public Collection<Object> createComponents(Client client, ClusterService clusterService, ThreadPool threadPool, ResourceWatcherService resourceWatcherService, ScriptService scriptService, NamedXContentRegistry xContentRegistry, Environment environment, NodeEnvironment nodeEnvironment, NamedWriteableRegistry namedWriteableRegistry, IndexNameExpressionResolver indexNameExpressionResolver, Supplier<RepositoriesService> repositoriesServiceSupplier) {
+        return super.createComponents(client, clusterService, threadPool, resourceWatcherService, scriptService, xContentRegistry, environment, nodeEnvironment, namedWriteableRegistry, indexNameExpressionResolver, repositoriesServiceSupplier);
+    }
+
 }

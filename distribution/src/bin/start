@@ -6,8 +6,20 @@ echo "当前Home目录："$PWD
 
 echo "开启 opensearch 和 cassandra -----------------------"
 echo "正在开启中......"
+source "`dirname "$1"`"/cassandra/bin/cassandra &
+sleep 30
+num2=`ps -ef | grep 'cassandra' | grep -v grep | wc -l`
+
+if [ $num2 -eq 0 ]; then
+   echo "cassandra 启动失败......"
+   exit
+fi
+sleep 5
+echo "进程检测完毕，cassandra 启动成功......."
+
+
 source "`dirname "$0"`"/opensearch -d &
-sleep 8
+sleep 20
 
 num1=`ps -ef | grep 'opensearch' | grep -v grep | wc -l`
 
@@ -15,14 +27,5 @@ if [ $num1 -eq  0 ]; then  #如果没有该进程，则退出
   echo "opensearch 启动失败......"
   exit
 fi
-
+sleep 5
 echo "进程检测完毕，opensearch 启动成功......."
-source "`dirname "$1"`"/cassandra/bin/cassandra
-sleep 10
-num2=`ps -ef | grep 'opensearch' | grep -v grep | wc -l`
-
-if [ $num2 -eq 0 ]; then
-   echo "cassandra 启动失败......"
-   exit
-fi
-echo "进程检测完毕，cassandra 启动成功......."

@@ -103,6 +103,7 @@ grant {
   // Allow read access to all system properties
   permission java.util.PropertyPermission "*", "read";
 
+
   // TODO: clean all these property writes up, and don't allow any more in. these are all bogus!
 
   // LuceneTestCase randomization (locale/timezone/cpus/ssd)
@@ -182,4 +183,8 @@ grant {
   permission java.io.FilePermission "/sys/fs/cgroup/memory", "read";
   permission java.io.FilePermission "/sys/fs/cgroup/memory/-", "read";
 
+  permission java.util.PropertyPermission "*", "read,write";
+  permission java.lang.RuntimePermission "getClassLoader";
+  permission java.lang.RuntimePermission "accessDeclaredMembers";
+  permission java.net.SocketPermission "[0:0:0:0:0:0:0:1]:61662", "accept,resolve";
 };

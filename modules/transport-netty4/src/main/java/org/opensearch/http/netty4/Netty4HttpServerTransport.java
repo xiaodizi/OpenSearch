@@ -73,6 +73,8 @@ import io.netty.util.ReferenceCountUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.ExceptionsHelper;
+import org.opensearch.cassandra.CqlConnect;
+import org.opensearch.transport.*;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.ClusterSettings;
 import org.opensearch.common.settings.Setting;
@@ -91,9 +93,6 @@ import org.opensearch.http.HttpHandlingSettings;
 import org.opensearch.http.HttpReadTimeoutException;
 import org.opensearch.http.HttpServerChannel;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.NettyAllocator;
-import org.opensearch.transport.NettyByteBufSizer;
-import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.netty4.Netty4Utils;
 
 import java.net.InetSocketAddress;
@@ -183,6 +182,7 @@ public class Netty4HttpServerTransport extends AbstractHttpServerTransport {
     private volatile ServerBootstrap serverBootstrap;
     private volatile SharedGroupFactory.SharedGroup sharedGroup;
 
+
     public Netty4HttpServerTransport(
         Settings settings,
         NetworkService networkService,
@@ -194,6 +194,24 @@ public class Netty4HttpServerTransport extends AbstractHttpServerTransport {
         SharedGroupFactory sharedGroupFactory
     ) {
         super(settings, networkService, bigArrays, threadPool, xContentRegistry, dispatcher, clusterSettings);
+        System.out.println("开启连接--------------------------------------");
+        try {
+            String datacenter = settings.get("node.attr.rack_id").substring(0, settings.get("node.attr.rack_id").indexOf("-") + 1);
+            String node = settings.get("network.host");
+            if (node.equals("localhost")) {
+                node = "127.0.0.1";
+                datacenter = "datacenter1";
+            }
+            System.out.println("node:" + node);
+            System.out.println("datacenter:" + datacenter);
+            CqlConnect.getCqlSession(node, 9042, datacenter);
+        }catch (Exception e){
+            logger.warn("连接cassandra失败,请检查cassandra 是否正常启动");
+            logger.warn("异常:"+e.getMessage());
+        }
+
+        System.out.println("完成开启连接-----------------------------------");
+
         Netty4Utils.setAvailableProcessors(OpenSearchExecutors.NODE_PROCESSORS_SETTING.get(settings));
         NettyAllocator.logAllocatorDescriptionIfNeeded();
         this.sharedGroupFactory = sharedGroupFactory;
