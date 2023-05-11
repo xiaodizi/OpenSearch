@@ -7,7 +7,18 @@ echo "当前Home目录："$PWD
 echo "开启 opensearch 和 cassandra -----------------------"
 echo "正在开启中......"
 source "`dirname "$1"`"/cassandra/bin/cassandra &
-sleep 30
+sleep 60
+
+result="`dirname "$1"`"/cassandra/bin/nodetool
+ret=1
+while [ $ret == 1 ]
+do
+  echo "正在检测 Cassandra 服务状态。。。。。。"
+  sh $result "status"
+  ret=$?
+done
+
+
 num2=`ps -ef | grep 'cassandra' | grep -v grep | wc -l`
 
 if [ $num2 -eq 0 ]; then

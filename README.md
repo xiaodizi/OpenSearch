@@ -18,7 +18,7 @@
 还需要 clone 子项目：
 
 ```shell
-git clone --recurse-submodules git@github.com:xiaodizi/cassandra.git
+git clone --recurse-submodules 路径
 ```
 
 ##### 2、执行编译cassandra，因为cassandra是使用的ant编译的，本地ant 1.10版本测试没有问题。先编译Cassandra的目的也就是为了拉取ant相关插件的包，尝试过集成编译，发现依旧还是会失败，所以还是建议先执行下边的命令。
@@ -95,6 +95,99 @@ rpc_address: ip1   ## 传输地址
 ```
 
 ip1 就是节点1 的ip地址，其他两个节点同样配置这四个就可以了。当然已经通用化的配置，需要修改 的可以酌情修改。这四个是构成集群的基本配置。
+
+##### 集群安装完成
+
+所有的cassandra 的脚本工具，都放在安装路径下的 `cassandra/bin` 文件夹下。
+检测cassandra 状态：
+
+```shell
+[elastic@elastic05 opensearch-3.0.0-SNAPSHOT]$ ./cassandra/bin/nodetool status
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address         Load       Tokens  Owns (effective)  Host ID                               Rack
+UN  192.168.184.31  70.28 KiB  16      67.6%             cf50ce53-1b27-4292-9819-8d17362c4bdc  rack1
+UN  192.168.184.33  70.28 KiB  16      69.1%             c0945ed1-9fa0-4b90-93b6-4ebe9aa80651  rack1
+UN  192.168.184.32  70.28 KiB  16      63.3%             d65ee310-d761-4fc4-849f-9d40adacfaf5  rack1
+```
+
+检测 Opensearch 启动状态：
+
+![img_2.png](./assets/img_2.png)
+
+##### 集群启动后一些注意事项
+1、因为Opensearch源码里，在启动Netty的时候，顺便用Cassandra的Java Driver ，这东西其实也是个Netty的客户端，所以启动Opensearch前，需要Cassandra 完全启动好，Java Driver 才能连接上去。当前这一切代码，都已经考虑到了。但是在检测Cassandra的状态的时候，使用了nodetool工具，如果程序一直没有获取到nodetool的正常状态，就会重复执行检查，这时候也许启动界面会有如下错误：
+```shell
+WARN  [GossipTasks:1] 2023-05-11 04:12:01,518 FailureDetector.java:335 - Not marking nodes down due to local pause of 9236573980ns > 5000000000ns
+正在检测 Cassandra 服务状态。。。。。。
+error: No nodes present in the cluster. Has this node finished starting up?
+-- StackTrace --
+java.lang.RuntimeException: No nodes present in the cluster. Has this node finished starting up?
+        at org.apache.cassandra.dht.Murmur3Partitioner.describeOwnership(Murmur3Partitioner.java:294)
+        at org.apache.cassandra.service.StorageService.getOwnershipWithPort(StorageService.java:5600)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+        at sun.reflect.misc.Trampoline.invoke(MethodUtil.java:71)
+        at jdk.internal.reflect.GeneratedMethodAccessor3.invoke(Unknown Source)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+        at java.base/sun.reflect.misc.MethodUtil.invoke(MethodUtil.java:260)
+        at java.management/com.sun.jmx.mbeanserver.StandardMBeanIntrospector.invokeM2(StandardMBeanIntrospector.java:112)
+        at java.management/com.sun.jmx.mbeanserver.StandardMBeanIntrospector.invokeM2(StandardMBeanIntrospector.java:46)
+        at java.management/com.sun.jmx.mbeanserver.MBeanIntrospector.invokeM(MBeanIntrospector.java:237)
+        at java.management/com.sun.jmx.mbeanserver.PerInterface.getAttribute(PerInterface.java:83)
+        at java.management/com.sun.jmx.mbeanserver.MBeanSupport.getAttribute(MBeanSupport.java:206)
+        at java.management/com.sun.jmx.interceptor.DefaultMBeanServerInterceptor.getAttribute(DefaultMBeanServerInterceptor.java:641)
+        at java.management/com.sun.jmx.mbeanserver.JmxMBeanServer.getAttribute(JmxMBeanServer.java:678)
+        at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl.doOperation(RMIConnectionImpl.java:1443)
+        at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl$PrivilegedOperation.run(RMIConnectionImpl.java:1307)
+        at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl.doPrivilegedOperation(RMIConnectionImpl.java:1399)
+        at java.management.rmi/javax.management.remote.rmi.RMIConnectionImpl.getAttribute(RMIConnectionImpl.java:637)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+        at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:359)
+        at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200)
+        at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197)
+        at java.base/java.security.AccessController.doPrivileged(Native Method)
+        at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196)
+        at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:562)
+        at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:796)
+        at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:677)
+        at java.base/java.security.AccessController.doPrivileged(Native Method)
+        at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:676)
+        at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+        at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+        at java.base/java.lang.Thread.run(Thread.java:834)
+```
+
+easy! 不要紧张，这主要 nodetool 在检测时候，发现状态不对，返回的错误，接着会再次检查，正常了，就会返回 检测完毕的。
+
+
+2、部署集群的时候，要注意。例如，我在测试的时候使用三节点的集群，启动需要一个一个的启动。这时候Cassandra会有如下错误：
+```shell
+INFO  [Messaging-EventLoop-3-1] 2023-05-11 04:11:34,209 NoSpamLogger.java:105 - /192.168.184.31:7000->/192.168.184.32:7000-URGENT_MESSAGES-[no-channel] failed to connect
+io.netty.channel.AbstractChannel$AnnotatedConnectException: finishConnect(..) failed: Connection refused: /192.168.184.32:7000
+Caused by: java.net.ConnectException: finishConnect(..) failed: Connection refused
+        at io.netty.channel.unix.Errors.throwConnectException(Errors.java:124)
+        at io.netty.channel.unix.Socket.finishConnect(Socket.java:251)
+        at io.netty.channel.epoll.AbstractEpollChannel$AbstractEpollUnsafe.doFinishConnect(AbstractEpollChannel.java:673)
+        at io.netty.channel.epoll.AbstractEpollChannel$AbstractEpollUnsafe.finishConnect(AbstractEpollChannel.java:650)
+        at io.netty.channel.epoll.AbstractEpollChannel$AbstractEpollUnsafe.epollOutReady(AbstractEpollChannel.java:530)
+        at io.netty.channel.epoll.EpollEventLoop.processReady(EpollEventLoop.java:470)
+        at io.netty.channel.epoll.EpollEventLoop.run(EpollEventLoop.java:378)
+        at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:989)
+        at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+        at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+        at java.base/java.lang.Thread.run(Thread.java:834)
+```
+
+这是因为集群通信也使用的Netty，连不上另外一个集群了，所以Cassandra报了一个错误。等到另外一个集群启动成功后，就会消失。
 
 ### 关于同步
 

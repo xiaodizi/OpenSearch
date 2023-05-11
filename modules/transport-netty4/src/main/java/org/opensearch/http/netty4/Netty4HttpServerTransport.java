@@ -200,8 +200,8 @@ public class Netty4HttpServerTransport extends AbstractHttpServerTransport {
             String node = settings.get("network.host");
             if (node.equals("localhost")) {
                 node = "127.0.0.1";
-                datacenter = "datacenter1";
             }
+            datacenter = "datacenter1";
             System.out.println("node:" + node);
             System.out.println("datacenter:" + datacenter);
             CqlConnect.getCqlSession(node, 9042, datacenter);
