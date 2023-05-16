@@ -118,7 +118,9 @@ UN  192.168.184.32  70.28 KiB  16      63.3%             d65ee310-d761-4fc4-849f
 ![img_2.png](./assets/img_2.png)
 
 ##### 集群启动后一些注意事项
+
 1、因为Opensearch源码里，在启动Netty的时候，顺便用Cassandra的Java Driver ，这东西其实也是个Netty的客户端，所以启动Opensearch前，需要Cassandra 完全启动好，Java Driver 才能连接上去。当前这一切代码，都已经考虑到了。但是在检测Cassandra的状态的时候，使用了nodetool工具，如果程序一直没有获取到nodetool的正常状态，就会重复执行检查，这时候也许启动界面会有如下错误：
+
 ```shell
 WARN  [GossipTasks:1] 2023-05-11 04:12:01,518 FailureDetector.java:335 - Not marking nodes down due to local pause of 9236573980ns > 5000000000ns
 正在检测 Cassandra 服务状态。。。。。。
@@ -168,8 +170,8 @@ java.lang.RuntimeException: No nodes present in the cluster. Has this node finis
 
 easy! 不要紧张，这主要 nodetool 在检测时候，发现状态不对，返回的错误，接着会再次检查，正常了，就会返回 检测完毕的。
 
-
 2、部署集群的时候，要注意。例如，我在测试的时候使用三节点的集群，启动需要一个一个的启动。这时候Cassandra会有如下错误：
+
 ```shell
 INFO  [Messaging-EventLoop-3-1] 2023-05-11 04:11:34,209 NoSpamLogger.java:105 - /192.168.184.31:7000->/192.168.184.32:7000-URGENT_MESSAGES-[no-channel] failed to connect
 io.netty.channel.AbstractChannel$AnnotatedConnectException: finishConnect(..) failed: Connection refused: /192.168.184.32:7000
@@ -207,7 +209,7 @@ CREATE TABLE users (
 ```
 
 多了 一个 `WITH syncEs=true;` 这样就是启动了同步到 Opensearch。
-但是这个东西 是默认为 true，如果希望这张表同步到Opensearch，不加这个配置也可以。但是如果希望这张表不同步到Opensearch的话，那就需要显示的增加`WITH syncEs=false;`。
+但是这个东西 是默认为 false，如果不希望这张表同步到Opensearch，不加这个配置也可以。但是如果希望这张表同步到Opensearch的话，那就需要显示的增加`WITH syncEs=true;`。
 
 ```
 CREATE TABLE users (
@@ -217,6 +219,10 @@ CREATE TABLE users (
                  age int
                ) WITH syncEs=false;
 ```
+
+
+重点说明一下`.cassandra_metadata` 这个索引：
+    因为cassandra的表配置是基于cql的，只是简单的存储在一个HashMap里边，所以将集群配置，放在了`Opensearch`里边了。
 
 ##### Opensearch 同步到 Cassandra
 
@@ -275,3 +281,46 @@ endpoint_snitch: SimpleSnitch
 # of the snitch, which will be assumed to be on your classpath.
 endpoint_snitch: GossipingPropertyFileSnitch
 ```
+
+### Cassandra keyspace的 Strategy 和 replactionFactory 配置
+
+```shell
+PUT cassandra1-test
+{
+  "settings":{
+    "index.cdc.enabled":true,
+    "index.cdc.cassandra.replaction.strategy":"NetworkTopologyStrategy",
+    "index.cdc.cassandra.replaction.factory":"3",
+    "number_of_shards":1,
+    "number_of_replicas":0
+  },
+  "mappings": {
+      "properties": {
+        "name": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "age":{
+          "type":"text"
+        }
+      }
+    }
+}
+```
+
+### 关于Cassandra的堆内存设置
+
+Cassandra启动后，堆是自动计算的，可以在`config`目录下的`jvm-server.options`文件 进行设置，而且也有一个很明确的官方注释。
+
+但是会频繁的GC，内存很容易被压榨的顶满，导致服务直接就挂了。
+
+建议还是根据内存情况做一下设置：
+
+![img_3.png](./assets/img_3.png)
+
+到底是否参考官网的计算公示，根据情况选择吧！目前是两个服务，没有主动做这方面的计算。默认现在做了一个配置，如有需要可以修改。

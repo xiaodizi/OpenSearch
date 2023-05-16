@@ -73,10 +73,13 @@ public class Netty4ModulePlugin extends Plugin implements NetworkPlugin {
     private final SetOnce<SharedGroupFactory> groupFactory = new SetOnce<>();
 
 
-    List<Setting<?>> settings = new ArrayList<>();
-
     private final Setting<Boolean> cdcEnableSetting = Setting.boolSetting(CDCPluginSettings.CDC_ENABLED, false,
         Setting.Property.IndexScope, Setting.Property.Dynamic);
+
+
+    private final Setting<String> replicationStrategy=Setting.simpleString(CDCPluginSettings.CDC_CASSANDRA_REPLACTION_STRATEGY,"SimpleStrategy",Setting.Property.IndexScope,Setting.Property.Dynamic);
+
+    private final Setting<Integer> replicationFactor=Setting.intSetting(CDCPluginSettings.CDC_CASSANDRA_REPLACTION_FACTORY,1,Setting.Property.IndexScope,Setting.Property.Dynamic);
 
 
     @Override
@@ -90,7 +93,9 @@ public class Netty4ModulePlugin extends Plugin implements NetworkPlugin {
             Netty4Transport.NETTY_RECEIVE_PREDICTOR_MIN,
             Netty4Transport.NETTY_RECEIVE_PREDICTOR_MAX,
             Netty4Transport.NETTY_BOSS_COUNT,
-            cdcEnableSetting
+            cdcEnableSetting,
+            replicationStrategy,
+            replicationFactor
         );
     }
 

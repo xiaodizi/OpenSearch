@@ -9,6 +9,7 @@
 package org.opensearch.cassandra;
 
 import com.alibaba.fastjson2.JSONObject;
+import io.netty.util.internal.StringUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.settings.Settings;
@@ -33,63 +34,85 @@ public class CDCListener implements IndexingOperationListener, IndexEventListene
 
     private volatile boolean cdcEnable = false;
 
+
+    private volatile String replicationStrategy = "SimpleStrategy";
+
+    private volatile int replicationFactor = 1;
+
     private final IndexModule indexModule;
 
 
     public CDCListener(IndexModule indexModule) {
         cdcEnable = Boolean.parseBoolean(indexModule.getSettings().get("index.cdc.enabled"));
+        String strategy = indexModule.getSettings().get("index.cdc.cassandra.replaction.strategy");
+        if (!StringUtil.isNullOrEmpty(strategy)) {
+            replicationStrategy = strategy;
+        }
+        String factoryInt = indexModule.getSettings().get("index.cdc.cassandra.replaction.factory");
+        if (!StringUtil.isNullOrEmpty(factoryInt)) {
+            replicationFactor = Integer.parseInt(factoryInt);
+        }
         this.indexModule = indexModule;
     }
 
     @Override
     public void afterIndexCreated(IndexService indexService) {
 
-        System.out.println("-----------LEI TEST 索引创建之后-----------");
-        System.out.println("索引名称:" + indexService.getIndexSettings().getIndex().getName());
+        logger.info("-----------LEI TEST 索引创建之后-----------");
+        logger.info("索引名称:" + indexService.getIndexSettings().getIndex().getName());
         IndexEventListener.super.afterIndexCreated(indexService);
     }
 
 
     @Override
     public void beforeIndexCreated(Index index, Settings indexSettings) {
-        System.out.println("-----------LEI TEST 索引创建之前 ----------");
-        System.out.println("索引名称:" + index.getName());
+        logger.info("-----------LEI TEST 索引创建之前 ----------");
+        logger.info("索引名称:" + index.getName());
 
         if (cdcEnable == false) {
             return;
         }
 
-        CassandraOperation.createKeyspace(index.getName(),"SimpleStrategy",1,CqlConnect.getCqlSession());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CassandraOperation.createKeyspace(index.getName(), replicationStrategy, replicationFactor, CqlConnect.getCqlSession());
+            }
+        }).start();
 
         IndexEventListener.super.beforeIndexCreated(index, indexSettings);
     }
 
     @Override
     public void beforeIndexAddedToCluster(Index index, Settings indexSettings) {
-        System.out.println("-----------LEI TEST 索引添加到集群之前-----------");
-        System.out.println("索引名称:" + index.getName());
+        logger.info("-----------LEI TEST 索引添加到集群之前-----------");
+        logger.info("索引名称:" + index.getName());
 
         if (cdcEnable == false) {
             return;
         }
 
-       CassandraOperation.createKeyspace(index.getName(),"SimpleStrategy",1,CqlConnect.getCqlSession());
-
-        System.out.println("------------------------------");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CassandraOperation.createKeyspace(index.getName(), replicationStrategy, replicationFactor, CqlConnect.getCqlSession());
+            }
+        }).start();
+        logger.info("------------------------------");
         IndexEventListener.super.beforeIndexAddedToCluster(index, indexSettings);
     }
 
 
     @Override
     public void afterIndexRemoved(Index index, IndexSettings indexSettings, IndicesClusterStateService.AllocatedIndices.IndexRemovalReason reason) {
-        System.out.println("-----------LEI TEST 索引删除之后-----------");
-        System.out.println("afterIndexRemoved 索引名称:" + index.getName());
+        logger.info("-----------LEI TEST 索引删除之后-----------");
+        logger.info("afterIndexRemoved 索引名称:" + index.getName());
 
         if (cdcEnable == false) {
             return;
         }
 
-        CassandraOperation.dropTable(index.getName(),CqlConnect.getCqlSession());
+        CassandraOperation.dropTable(index.getName(), CqlConnect.getCqlSession());
 
         System.out.println("------------------------------");
 
@@ -102,14 +125,13 @@ public class CDCListener implements IndexingOperationListener, IndexEventListene
         String indexName = shardId.getIndex().getName();
 
 
-
         if (cdcEnable == false) {
             return;
         }
         String deleteId = delete.id();
         logger.info("----------Delete start------------");
-        logger.info("删除索引名称:" + indexName+"；删除id:"+deleteId);
-        CassandraOperation.deleteById(indexName,deleteId,CqlConnect.getCqlSession());
+        logger.info("删除索引名称:" + indexName + "；删除id:" + deleteId);
+        CassandraOperation.deleteById(indexName, deleteId, CqlConnect.getCqlSession());
         logger.info("----------Delete end------------");
     }
 
@@ -126,14 +148,19 @@ public class CDCListener implements IndexingOperationListener, IndexEventListene
             return;
         }
         logger.info("--------------------------Index start----------------------------");
-        String utf8ToString = index.parsedDoc().source().utf8ToString();
-        JSONObject  jsonObject = JSONObject.parseObject(utf8ToString);
-        Map<String,Object> map = (Map<String,Object>)jsonObject;
-        if (result.isCreated()) {
-            CassandraOperation.createTables(indexName, map, id, CqlConnect.getCqlSession());
-        }else {
-            CassandraOperation.updateTables(indexName,map,id,CqlConnect.getCqlSession());
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String utf8ToString = index.parsedDoc().source().utf8ToString();
+                JSONObject jsonObject = JSONObject.parseObject(utf8ToString);
+                Map<String, Object> map = (Map<String, Object>) jsonObject;
+                if (result.isCreated()) {
+                    CassandraOperation.createTables(indexName, map, id, CqlConnect.getCqlSession());
+                } else {
+                    CassandraOperation.updateTables(indexName, map, id, CqlConnect.getCqlSession());
+                }
+            }
+        }).start();
         logger.info("--------------------------Index end----------------------------");
 
     }

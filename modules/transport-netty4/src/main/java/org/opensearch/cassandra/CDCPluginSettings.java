@@ -12,6 +12,10 @@ public class CDCPluginSettings {
 
     public static final String CDC_ENABLED = "index.cdc.enabled";
 
+    public static final String CDC_CASSANDRA_REPLACTION_STRATEGY="index.cdc.cassandra.replaction.strategy";
+
+    public static final String CDC_CASSANDRA_REPLACTION_FACTORY="index.cdc.cassandra.replaction.factory";
+
     public static final String CDC_PK_COL = "index.cdc.pk.column";
     public static final String CDC_EXCLUDE_COLS = "index.cdc.exclude.columns";
 

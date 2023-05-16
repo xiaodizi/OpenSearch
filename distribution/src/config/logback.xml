@@ -120,7 +120,7 @@ appender reference in the root level section below.
   <appender name="LogbackMetrics" class="com.codahale.metrics.logback.InstrumentedAppender" />
    -->
 
-  <root level="ERROR,IFNO,DEBUG,WARN">
+  <root level="ERROR,IFNO,WARN">
     <appender-ref ref="SYSTEMLOG" />
     <appender-ref ref="STDOUT" />
     <appender-ref ref="ASYNCDEBUGLOG" /> <!-- Comment this line to disable debug.log -->
@@ -129,5 +129,5 @@ appender reference in the root level section below.
     -->
   </root>
 
-  <logger name="org.apache.cassandra" level="ERROR,IFNO,DEBUG,WARN"/>
+  <logger name="org.apache.cassandra" level="ERROR,IFNO,WARN"/>
 </configuration>
