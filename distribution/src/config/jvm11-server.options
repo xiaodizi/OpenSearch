@@ -8,6 +8,9 @@
 #  GC SETTINGS  #
 #################
 
+-Xms800M
+-Xmx800M
+-Xmn200M
 
 
 ### CMS Settings

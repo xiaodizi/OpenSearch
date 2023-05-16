@@ -102,9 +102,6 @@ dependencies {
 
   api localGroovy()
 
-  //api fileTree(dir:'lib',include:['*.jar'])
-  api files('lib/cassandra-all-4.1.1-SNAPSHOT.jar')
-
   api 'commons-codec:commons-codec:1.15'
   api 'org.apache.commons:commons-compress:1.22'
   api 'org.apache.ant:ant:1.10.13'

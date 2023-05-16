@@ -36,6 +36,8 @@ git clone --recurse-submodules 路径
 
 ##### 4、编译打包 linux 系统版本
 
+ps：编译linux版本需要，先编译 cassandra
+
 ```shell
 ./gradlew :distribution:archives:linux-tar:assemble
 ```
@@ -316,7 +318,9 @@ PUT cassandra1-test
 
 ### 关于Cassandra的堆内存设置
 
-Cassandra启动后，堆是自动计算的，可以在`config`目录下的`jvm-server.options`文件 进行设置，而且也有一个很明确的官方注释。
+1、Cassandra启动后，堆是自动计算的，可以在`config`目录下的`jvm-server.options`文件 进行设置，而且也有一个很明确的官方注释。
+
+默认配置是800MB.
 
 但是会频繁的GC，内存很容易被压榨的顶满，导致服务直接就挂了。
 
@@ -325,3 +329,10 @@ Cassandra启动后，堆是自动计算的，可以在`config`目录下的`jvm-s
 ![img_3.png](./assets/img_3.png)
 
 到底是否参考官网的计算公示，根据情况选择吧！目前是两个服务，没有主动做这方面的计算。默认现在做了一个配置，如有需要可以修改。
+
+
+2、Opensearch启动后，有boot Check。低于2G内存是启动不起来的。所以`jvm.options`配置文件配置最大堆和最小堆都是2G，官方在5.0之后也解释如果这个最大和最小计算出现误差，也不允许启动的，还是建议配置一样。
+
+
+3、所以想两个服务都正常启动，建议硬件内存不要低于3G。
+
