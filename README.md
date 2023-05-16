@@ -14,6 +14,7 @@
 
 * Open JDK 11
 * Runtime OpenJDK 14
+* 硬件内存，最少3G，低于3G服务无法正常启动。
 
 还需要 clone 子项目：
 
