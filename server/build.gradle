@@ -113,6 +113,20 @@ dependencies {
   api "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}"
   api "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson_databind}"
   api "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson_databind}"
+  api "org.yaml:snakeyaml:${versions.snakeyaml}"
+  api 'com.google.code.findbugs:jsr305:3.0.2'
+  api 'com.github.stephenc.high-scale-lib:high-scale-lib:1.1.4'
+
+  api "io.netty:netty-handler:${versions.netty}"
+  api "io.netty:netty-buffer:${versions.netty}"
+  api "io.netty:netty-common:${versions.netty}"
+  api "io.netty:netty-all:${versions.netty}"
+
+  api 'org.apache.commons:commons-lang3:3.12.0'
+  api 'com.github.jbellis:jamm:0.3.2'
+  api 'org.lz4:lz4-java:1.8.0'
+  api 'org.jctools:jctools-core:1.0'
+
 
 
   api project(':libs:opensearch-common')

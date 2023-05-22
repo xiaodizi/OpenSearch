@@ -87,10 +87,15 @@ class OpenSearch extends EnvironmentAwareCommand {
      * 启动opensearch的主要入口点
      */
     public static void main(final String[] args) throws Exception {
+        System.setProperty("cassandra.config","file://"+System.getProperty("opensearch.path.conf")+"/cassandra.yaml");
 
+        System.setProperty("cassandra.storagedir","./");
 
         CassandraDaemon daemon=new CassandraDaemon();
         daemon.activate();
+
+
+
 
         overrideDnsCachePolicyProperties();
         /*

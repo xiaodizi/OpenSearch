@@ -195,20 +195,20 @@ public class Netty4HttpServerTransport extends AbstractHttpServerTransport {
     ) {
         super(settings, networkService, bigArrays, threadPool, xContentRegistry, dispatcher, clusterSettings);
         logger.info("开启连接--------------------------------------");
-        try {
-            String datacenter = settings.get("node.attr.rack_id").substring(0, settings.get("node.attr.rack_id").indexOf("-") + 1);
-            String node = settings.get("network.host");
-            if (node.equals("localhost")) {
-                node = "127.0.0.1";
-            }
-            datacenter = "datacenter1";
-            logger.info("node:" + node);
-            logger.info("datacenter:" + datacenter);
-            CqlConnect.getCqlSession(node, 9042, datacenter);
-        }catch (Exception e){
-            logger.warn("连接cassandra失败,请检查cassandra 是否正常启动");
-            logger.warn("异常:"+e.getMessage());
-        }
+//        try {
+//            String datacenter = settings.get("node.attr.rack_id").substring(0, settings.get("node.attr.rack_id").indexOf("-") + 1);
+//            String node = settings.get("network.host");
+//            if (node.equals("localhost")) {
+//                node = "127.0.0.1";
+//            }
+//            datacenter = "datacenter1";
+//            logger.info("node:" + node);
+//            logger.info("datacenter:" + datacenter);
+//            CqlConnect.getCqlSession(node, 9042, datacenter);
+//        }catch (Exception e){
+//            logger.warn("连接cassandra失败,请检查cassandra 是否正常启动");
+//            logger.warn("异常:"+e.getMessage());
+//        }
 
         logger.info("完成开启连接-----------------------------------");
 
