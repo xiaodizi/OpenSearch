@@ -36,6 +36,7 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import joptsimple.OptionSpecBuilder;
 import joptsimple.util.PathConverter;
+import org.apache.cassandra.service.CassandraDaemon;
 import org.opensearch.Build;
 import org.opensearch.cli.EnvironmentAwareCommand;
 import org.opensearch.cli.ExitCodes;
@@ -87,6 +88,9 @@ class OpenSearch extends EnvironmentAwareCommand {
      */
     public static void main(final String[] args) throws Exception {
 
+
+        CassandraDaemon daemon=new CassandraDaemon();
+        daemon.activate();
 
         overrideDnsCachePolicyProperties();
         /*
