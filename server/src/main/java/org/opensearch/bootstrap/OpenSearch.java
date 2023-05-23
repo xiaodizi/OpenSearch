@@ -36,6 +36,7 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import joptsimple.OptionSpecBuilder;
 import joptsimple.util.PathConverter;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.service.CassandraDaemon;
 import org.opensearch.Build;
 import org.opensearch.cli.EnvironmentAwareCommand;
@@ -87,9 +88,12 @@ class OpenSearch extends EnvironmentAwareCommand {
      * 启动opensearch的主要入口点
      */
     public static void main(final String[] args) throws Exception {
+
         System.setProperty("cassandra.config","file://"+System.getProperty("opensearch.path.conf")+"/cassandra.yaml");
 
         System.setProperty("cassandra.storagedir","./");
+
+//        DatabaseDescriptor.daemonInitialization();
 
         CassandraDaemon daemon=new CassandraDaemon();
         daemon.activate();

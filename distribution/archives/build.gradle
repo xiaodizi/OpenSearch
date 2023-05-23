@@ -83,6 +83,7 @@ CopySpec archiveFiles(CopySpec modulesFiles, String distributionType, String pla
       with cassandraBFiles()
       with cassandraPyFiles()
       with cassandraToolsFiles()
+      with cassandraLibFiles()
     }
   }
 }
