@@ -37,7 +37,6 @@ public class CassandraOperation {
      * 删除表
      */
     public static void dropTable(String tableName,CqlSession session) {
-        long timeStart = System.currentTimeMillis();
         // 如果 "-" 在开头 或者 在结尾 ，或者 不存在 "-" 都不会向cassandra 创建表。
         // 需要 在"-" 两端都有，有效的字符
         if (tableName.indexOf("-") < 2 || tableName.indexOf("-") == (tableName.length() - 1)) {
@@ -51,7 +50,6 @@ public class CassandraOperation {
         if (isNullKeyspace(tableName,keyspace,session)){
             session.execute("drop keyspace "+keyspace+";");
         }
-        System.out.println("用时：" + (System.currentTimeMillis() - timeStart));
     }
 
 
@@ -60,9 +58,6 @@ public class CassandraOperation {
      */
     public static void createKeyspace(
         String tableName, String replicationStrategy, int replicationFactor, CqlSession session) {
-        long timeStart = System.currentTimeMillis();
-        // 如果 "-" 在开头 或者 在结尾 ，或者 不存在 "-" 都不会向cassandra 创建表。
-        // 需要 在"-" 两端都有，有效的字符
         if (tableName.indexOf("-") < 2 || tableName.indexOf("-") == (tableName.length() - 1)) {
             return;
         }
@@ -77,16 +72,13 @@ public class CassandraOperation {
                 .append("};");
 
         String query = sb.toString();
-        System.out.println("创建 keyspace 语句："+query);
         session.execute(query);
-        System.out.println("用时：" + (System.currentTimeMillis() - timeStart));
     }
 
     /**
      * 创建表 并写入数据
      */
     public static void createTables(String tableName, Map<String, Object> map, String dataId, CqlSession session) {
-        long timeStart = System.currentTimeMillis();
 
         // 如果 "-" 在开头 或者 在结尾 ，或者 不存在 "-" 都不会向cassandra 创建表。
         // 需要 在"-" 两端都有，有效的字符
@@ -120,8 +112,6 @@ public class CassandraOperation {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        System.out.println("用时：" + (System.currentTimeMillis() - timeStart));
     }
 
 
@@ -129,7 +119,6 @@ public class CassandraOperation {
      * 更新表数据
      */
     public static void updateTables(String tableName,Map<String,Object> map,String dataId,CqlSession session){
-        long timeStart = System.currentTimeMillis();
 
         // 如果 "-" 在开头 或者 在结尾 ，或者 不存在 "-" 都不会向cassandra 创建表。
         // 需要 在"-" 两端都有，有效的字符
@@ -147,7 +136,6 @@ public class CassandraOperation {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("用时：" + (System.currentTimeMillis() - timeStart));
     }
 
 

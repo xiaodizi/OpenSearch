@@ -5,12 +5,14 @@ echo "当前Home目录："$PWD
 
 echo "停止 opensearch 和 cassandra -----------------------"
 
+user=`whoami`
+
 pids1=$(ps -ef | grep "opensearch" | grep -v grep | grep -v cassandra | awk '{print $2}')
 
 for pid in ${pids1}
 do
     echo "kill opensearch 服务, pid" $pid
-    kill -9 $pid
+    pgrep -u $user -f opensearch | xargs kill -9
 done
 
 echo "opensearch 停止成功"
@@ -21,7 +23,7 @@ pids2=$(ps -ef | grep "cassandra" | grep -v grep | awk '{print $2}')
 for pid in ${pids2}
 do
     echo "kill cassandra 服务, pid" $pid
-    kill -9 $pid
+    pgrep -u $user -f cassandra | xargs kill -9
 done
 
 

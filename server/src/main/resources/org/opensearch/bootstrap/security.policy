@@ -187,4 +187,6 @@ grant {
   permission java.lang.RuntimePermission "getClassLoader";
   permission java.lang.RuntimePermission "accessDeclaredMembers";
   permission java.net.SocketPermission "[0:0:0:0:0:0:0:1]:61662", "accept,resolve";
+  permission java.lang.RuntimePermission "accessUserInformation";
+  permission java.util.PropertyPermission "java.runtime.name", "read";
 };
