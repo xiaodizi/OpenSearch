@@ -33,8 +33,6 @@
 package org.opensearch.transport;
 
 import org.opensearch.Version;
-import org.opensearch.cassandra.CDCListener;
-import org.opensearch.cassandra.CDCPluginSettings;
 import org.opensearch.client.Client;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.service.ClusterService;
@@ -73,14 +71,6 @@ public class Netty4ModulePlugin extends Plugin implements NetworkPlugin {
     private final SetOnce<SharedGroupFactory> groupFactory = new SetOnce<>();
 
 
-    private final Setting<Boolean> cdcEnableSetting = Setting.boolSetting(CDCPluginSettings.CDC_ENABLED, false,
-        Setting.Property.IndexScope, Setting.Property.Dynamic);
-
-
-    private final Setting<String> replicationStrategy=Setting.simpleString(CDCPluginSettings.CDC_CASSANDRA_REPLACTION_STRATEGY,"SimpleStrategy",Setting.Property.IndexScope,Setting.Property.Dynamic);
-
-    private final Setting<Integer> replicationFactor=Setting.intSetting(CDCPluginSettings.CDC_CASSANDRA_REPLACTION_FACTORY,1,Setting.Property.IndexScope,Setting.Property.Dynamic);
-
 
     @Override
     public List<Setting<?>> getSettings() {
@@ -92,10 +82,7 @@ public class Netty4ModulePlugin extends Plugin implements NetworkPlugin {
             Netty4Transport.NETTY_RECEIVE_PREDICTOR_SIZE,
             Netty4Transport.NETTY_RECEIVE_PREDICTOR_MIN,
             Netty4Transport.NETTY_RECEIVE_PREDICTOR_MAX,
-            Netty4Transport.NETTY_BOSS_COUNT,
-            cdcEnableSetting,
-            replicationStrategy,
-            replicationFactor
+            Netty4Transport.NETTY_BOSS_COUNT
         );
     }
 
@@ -171,14 +158,6 @@ public class Netty4ModulePlugin extends Plugin implements NetworkPlugin {
         }
     }
 
-
-    @Override
-    public void onIndexModule(IndexModule indexModule) {
-
-        final CDCListener cdcListener = new CDCListener(indexModule);
-        indexModule.addIndexEventListener(cdcListener);
-        indexModule.addIndexOperationListener(cdcListener);
-    }
 
     @Override
     public Collection<Object> createComponents(Client client, ClusterService clusterService, ThreadPool threadPool, ResourceWatcherService resourceWatcherService, ScriptService scriptService, NamedXContentRegistry xContentRegistry, Environment environment, NodeEnvironment nodeEnvironment, NamedWriteableRegistry namedWriteableRegistry, IndexNameExpressionResolver indexNameExpressionResolver, Supplier<RepositoriesService> repositoriesServiceSupplier) {

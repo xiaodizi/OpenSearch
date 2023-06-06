@@ -93,10 +93,8 @@ class OpenSearch extends EnvironmentAwareCommand {
 
         System.setProperty("cassandra.storagedir","./");
 
-//        DatabaseDescriptor.daemonInitialization();
-
         CassandraDaemon daemon=new CassandraDaemon();
-        daemon.activate();
+       // daemon.activate();
 
 
 

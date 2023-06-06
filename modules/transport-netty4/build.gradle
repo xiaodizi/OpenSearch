@@ -64,15 +64,6 @@ dependencies {
   api "io.netty:netty-resolver:${versions.netty}"
   api "io.netty:netty-transport:${versions.netty}"
   api "io.netty:netty-transport-native-unix-common:${versions.netty}"
-
-  api group: 'com.datastax.oss', name: 'java-driver-core', version: '4.15.0'
-  api group: 'com.datastax.oss', name: 'java-driver-query-builder', version: '4.15.0'
-  api group: 'com.datastax.oss', name: 'java-driver-mapper-runtime', version: '4.15.0'
-  api group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
-  api group: 'com.datastax.oss', name: 'java-driver-shaded-guava', version: '25.1-jre'
-  api group: 'com.typesafe', name: 'config', version: '1.4.2'
-  api group: 'com.datastax.oss', name: 'native-protocol', version: '1.5.1'
-//  api group: 'com.alibaba.fastjson2', name: 'fastjson2', version: '2.0.31'
 }
 
 restResources {
