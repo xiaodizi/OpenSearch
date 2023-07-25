@@ -36,8 +36,6 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import joptsimple.OptionSpecBuilder;
 import joptsimple.util.PathConverter;
-import org.apache.cassandra.config.DatabaseDescriptor;
-import org.apache.cassandra.service.CassandraDaemon;
 import org.opensearch.Build;
 import org.opensearch.cli.EnvironmentAwareCommand;
 import org.opensearch.cli.ExitCodes;
@@ -70,7 +68,8 @@ class OpenSearch extends EnvironmentAwareCommand {
 
     // visible for testing
     OpenSearch() {
-        super("Starts OpenSearch", () -> {}); // we configure logging later so we override the base class from configuring logging
+        super("Starts OpenSearch", () -> {
+        }); // we configure logging later so we override the base class from configuring logging
         versionOption = parser.acceptsAll(Arrays.asList("V", "version"), "Prints OpenSearch version information and exits");
         daemonizeOption = parser.acceptsAll(Arrays.asList("d", "daemonize"), "Starts OpenSearch in the background")
             .availableUnless(versionOption);
@@ -89,15 +88,17 @@ class OpenSearch extends EnvironmentAwareCommand {
      */
     public static void main(final String[] args) throws Exception {
 
-        System.setProperty("cassandra.config","file://"+System.getProperty("opensearch.path.conf")+"/cassandra.yaml");
-
-        System.setProperty("cassandra.storagedir","./");
-
-        CassandraDaemon daemon=new CassandraDaemon();
-       // daemon.activate();
-
-
-
+//        System.setProperty("cassandra.config", "file://" + System.getProperty("opensearch.path.conf") + "/cassandra.yaml");
+//
+//        System.setProperty("cassandra.storagedir", "./");
+//
+//        try {
+//            CassandraDaemon daemon = new CassandraDaemon();
+//            daemon.activate();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         overrideDnsCachePolicyProperties();
         /*
@@ -135,7 +136,7 @@ class OpenSearch extends EnvironmentAwareCommand {
     }
 
     private static void overrideDnsCachePolicyProperties() {
-        for (final String property : new String[] { "networkaddress.cache.ttl", "networkaddress.cache.negative.ttl" }) {
+        for (final String property : new String[]{"networkaddress.cache.ttl", "networkaddress.cache.negative.ttl"}) {
             final String overrideProperty = "opensearch." + property;
             final String overrideValue = System.getProperty(overrideProperty);
             if (overrideValue != null) {
@@ -208,9 +209,9 @@ class OpenSearch extends EnvironmentAwareCommand {
     /**
      * Required method that's called by Apache Commons procrun when
      * running as a service on Windows, when the service is stopped.
-     *
+     * <p>
      * http://commons.apache.org/proper/commons-daemon/procrun.html
-     *
+     * <p>
      * NOTE: If this method is renamed and/or moved, make sure to
      * update opensearch-service.bat!
      */

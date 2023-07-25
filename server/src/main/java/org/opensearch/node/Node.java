@@ -398,6 +398,7 @@ public class Node implements Closeable {
             Settings newSettings = NodeSetting.nodeSettings(initialEnvironment.dataFiles()[0].toString(),
                 initialEnvironment.settings(),
                 cassandraYaml,snitchProperties);
+
             Settings tmpSettings = Settings.builder()
                 .put(newSettings)
                 .put(Client.CLIENT_TYPE_SETTING_S.getKey(), CLIENT_TYPE)

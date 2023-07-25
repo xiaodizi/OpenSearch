@@ -639,17 +639,5 @@ tasks.named(JavaBasePlugin.CHECK_TASK_NAME) {
   dependsOn tasks.named('testAggregateTestReport', TestReport)
 }
 
-// 整合 cassandra 编译 任务
-def jdk = System.getenv('JAVA_HOME')
-ant.setProperty("javac.executable", jdk + "/bin/javac")
-//ant.properties['JAVA_HOME']=jdk8
-//ant.properties['javac.executable']=jdk8+'/bin/javac'
-ant.importBuild('server/cassandra/build.xml') { antTargetName ->
-  'cassandra-' + antTargetName
-}
-
-tasks.getByName('localDistro').dependsOn('cassandra-artifacts')
-tasks.getByName('assemble').dependsOn('cassandra-artifacts')
-tasks.getByName('build').dependsOn('cassandra-artifacts')
 
 
