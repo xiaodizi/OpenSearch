@@ -44,8 +44,32 @@
 # 10:-XX:-UseConcMarkSweepGC
 # 10:-XX:-UseCMSInitiatingOccupancyOnly
 11-:-XX:+UseG1GC
-11-:-XX:G1ReservePercent=25
-11-:-XX:InitiatingHeapOccupancyPercent=30
+# full gc效率更高
+11-:-XX:+ExplicitGCInvokesConcurrent
+11-:-XX:+UseGCOverheadLimit
+# # # 启动并发GC周期时的堆内存占用百分比.
+11-:-XX:InitiatingHeapOccupancyPercent=25
+# G1为分配担保预留的空间比例 默认10%
+11-:-XX:G1ReservePercent=15
+# 表示每次GC最大的停顿毫秒数，默认200，减少该值会增加系统load。
+11-:-XX:MaxGCPauseMillis=100
+
+-Djdk.attach.allowAttachSelf=true
+--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED
+--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
+--add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+--add-exports=java.management.rmi/com.sun.jmx.remote.internal.rmi=ALL-UNNAMED
+--add-exports=java.rmi/sun.rmi.registry=ALL-UNNAMED
+--add-exports=java.rmi/sun.rmi.server=ALL-UNNAMED
+--add-exports=java.sql/java.sql=ALL-UNNAMED
+--add-opens=java.base/java.lang.module=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.math=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.module=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.util.jar=ALL-UNNAMED
+--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED
 
 ## JVM temporary directory
 -Djava.io.tmpdir=${OPENSEARCH_TMPDIR}

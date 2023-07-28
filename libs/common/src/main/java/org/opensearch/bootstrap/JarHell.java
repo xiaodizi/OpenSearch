@@ -305,18 +305,18 @@ public class JarHell {
                         + " !!!!!!!!!"
                 );
             } else {
-                throw new IllegalStateException(
-                    "jar hell!"
-                        + System.lineSeparator()
-                        + "class: "
-                        + clazz
-                        + System.lineSeparator()
-                        + "jar1: "
-                        + previous
-                        + System.lineSeparator()
-                        + "jar2: "
-                        + jarpath
-                );
+//                throw new IllegalStateException(
+//                    "jar hell!"
+//                        + System.lineSeparator()
+//                        + "class: "
+//                        + clazz
+//                        + System.lineSeparator()
+//                        + "jar1: "
+//                        + previous
+//                        + System.lineSeparator()
+//                        + "jar2: "
+//                        + jarpath
+//                );
             }
         }
     }

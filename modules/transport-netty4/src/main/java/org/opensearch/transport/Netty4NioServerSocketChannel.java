@@ -31,7 +31,7 @@ public class Netty4NioServerSocketChannel extends NioServerSocketChannel {
     }
 
     public Netty4NioServerSocketChannel(SelectorProvider provider, InternetProtocolFamily family) {
-        super(provider, family);
+        super(provider);
     }
 
     public Netty4NioServerSocketChannel(ServerSocketChannel channel) {

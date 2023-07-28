@@ -60,9 +60,10 @@ configurations {
 dependencies {
   api "org.apache.hadoop:hadoop-client-api:${versions.hadoop3}"
   runtimeOnly "org.apache.hadoop:hadoop-client-runtime:${versions.hadoop3}"
-  api("org.apache.hadoop:hadoop-hdfs:${versions.hadoop3}") {
+  api ("org.apache.hadoop:hadoop-hdfs:${versions.hadoop3}") {
     exclude module: 'jetty-server'
     exclude group: 'org.codehaus.jackson'
+    exclude group: 'io.netty', module: 'netty-all'
   }
   api 'org.apache.htrace:htrace-core4:4.2.0-incubating'
   api "org.apache.logging.log4j:log4j-core:${versions.log4j}"
@@ -80,10 +81,10 @@ dependencies {
   api 'org.apache.commons:commons-lang3:3.12.0'
   implementation 'com.google.re2j:re2j:1.7'
   api 'javax.servlet:servlet-api:2.5'
-  api "org.slf4j:slf4j-api:${versions.slf4j}"
-  api "org.apache.logging.log4j:log4j-slf4j-impl:${versions.log4j}"
+//  api "org.slf4j:slf4j-api:${versions.slf4j}"
+//  api "org.apache.logging.log4j:log4j-slf4j-impl:${versions.log4j}"
   api 'net.minidev:json-smart:2.4.10'
-  api "io.netty:netty-all:${versions.netty}"
+  //api "io.netty:netty-all:${versions.netty}"
   implementation "com.fasterxml.woodstox:woodstox-core:${versions.woodstox}"
   implementation 'org.codehaus.woodstox:stax2-api:4.2.1'
 

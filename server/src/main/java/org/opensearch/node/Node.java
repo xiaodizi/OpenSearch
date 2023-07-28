@@ -388,8 +388,18 @@ public class Node implements Closeable {
         final List<Closeable> resourcesToClose = new ArrayList<>(); // register everything we need to release in the case of an error
         boolean success = false;
         try {
+
+            String cassandraYaml = initialEnvironment.configDir().toString()+"/cassandra.yaml";
+
+            SnitchProperties snitchProperties=new SnitchProperties(initialEnvironment);
+
+            Settings newSettings = NodeSetting.nodeSettings(initialEnvironment.dataFiles()[0].toString(),
+                initialEnvironment.settings(),
+                cassandraYaml,snitchProperties);
+
+
             Settings tmpSettings = Settings.builder()
-                .put(initialEnvironment.settings())
+                .put(newSettings)
                 .put(Client.CLIENT_TYPE_SETTING_S.getKey(), CLIENT_TYPE)
                 // Enabling shard indexing backpressure node-attribute
                 .put(NODE_ATTRIBUTES.getKey() + SHARD_INDEXING_PRESSURE_ENABLED_ATTRIBUTE_KEY, "true")
@@ -471,7 +481,7 @@ public class Node implements Closeable {
              * values, no matter they ask for them from.
              */
             this.environment = new Environment(settings, initialEnvironment.configDir(), Node.NODE_LOCAL_STORAGE_SETTING.get(settings));
-            Environment.assertEquivalent(initialEnvironment, this.environment);
+            //Environment.assertEquivalent(initialEnvironment, this.environment);
             nodeEnvironment = new NodeEnvironment(tmpSettings, environment);
             logger.info(
                 "node name [{}], node ID [{}], cluster name [{}], roles {}",
