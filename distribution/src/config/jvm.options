@@ -47,8 +47,39 @@
 11-:-XX:G1ReservePercent=25
 11-:-XX:InitiatingHeapOccupancyPercent=30
 
+
+-Djdk.attach.allowAttachSelf=true
+--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED
+--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
+--add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+--add-exports=java.management.rmi/com.sun.jmx.remote.internal.rmi=ALL-UNNAMED
+--add-exports=java.rmi/sun.rmi.registry=ALL-UNNAMED
+--add-exports=java.rmi/sun.rmi.server=ALL-UNNAMED
+--add-exports=java.sql/java.sql=ALL-UNNAMED
+--add-opens=java.base/java.lang.module=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.math=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.module=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.util.jar=ALL-UNNAMED
+--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED
+
 ## JVM temporary directory
 -Djava.io.tmpdir=${OPENSEARCH_TMPDIR}
+
+
+## JVM 远程监测配置，如果需要自行打开。默认使用7199，跟nodetool工具使用端口一样，不建议修改端口。
+#-Djava.rmi.server.hostname=127.0.0.1
+#-Dcom.sun.management.jmxremote=true
+#-Dcom.sun.management.jmxremote.port=7199
+#-Dcom.sun.management.jmxremote.authenticate=false
+#-Dcom.sun.management.jmxremote.ssl=false
+
+
+## 节点异常后，重启会会出现：节点IP:7000 已存在的问题，需要打包这两个配置，再根据情况调整。
+#-Dcassandra.allow_unsafe_replace=true
+#-Dcassandra.replace_address=<IP>
 
 ## heap dumps
 
@@ -78,10 +109,3 @@ ${error.file}
 
 # Explicitly allow security manager (https://bugs.openjdk.java.net/browse/JDK-8270380)
 18-:-Djava.security.manager=allow
-
-# JDK 20+ Incubating Vector Module for SIMD optimizations;
-# disabling may reduce performance on vector optimized lucene
-20:--add-modules=jdk.incubator.vector
-
-# HDFS ForkJoinPool.common() support by SecurityManager
--Djava.util.concurrent.ForkJoinPool.common.threadFactory=org.opensearch.secure_sm.SecuredForkJoinWorkerThreadFactory

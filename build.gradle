@@ -76,6 +76,15 @@ allprojects {
   group = 'org.opensearch'
   version = VersionProperties.getOpenSearch()
   description = "OpenSearch subproject ${project.path}"
+
+  repositories {
+    maven {
+      url = 'https://gitee.com/xuanxuan1177/lei/raw/master'
+    }
+    mavenCentral()
+    google()
+    jcenter()
+  }
 }
 
 configure(allprojects - project(':distribution:archives:integ-test-zip')) {

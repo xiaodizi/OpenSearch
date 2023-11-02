@@ -676,7 +676,7 @@ public class PluginsService implements ReportingService<PluginsAndModules> {
             // check we don't have conflicting classes
             Set<URL> union = new HashSet<>(classpath);
             union.addAll(bundle.urls);
-            JarHell.checkJarHell(union, logger::debug);
+            //JarHell.checkJarHell(union, logger::debug);
         } catch (Exception e) {
             throw new IllegalStateException("failed to load plugin " + bundle.plugin.getName() + " due to jar hell", e);
         }

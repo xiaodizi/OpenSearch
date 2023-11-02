@@ -99,6 +99,8 @@ public class InternalSettingsPreparer {
             }
         }
 
+        output.put("cluster.name",NodeSetting.getCassandraYamlByKey("cluster_name", System.getProperty("opensearch.path.conf")+"/cassandra.yaml"));
+
         // re-initialize settings now that the config file has been loaded
         initializeSettings(output, input, properties);
         checkSettingsForTerminalDeprecation(output);

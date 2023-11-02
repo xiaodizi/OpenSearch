@@ -36,6 +36,8 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import joptsimple.OptionSpecBuilder;
 import joptsimple.util.PathConverter;
+import org.apache.ratu.Cassandra;
+import org.apache.ratu.JanusgraphServer;
 import org.opensearch.Build;
 import org.opensearch.cli.EnvironmentAwareCommand;
 import org.opensearch.cli.ExitCodes;
@@ -84,6 +86,8 @@ class OpenSearch extends EnvironmentAwareCommand {
      * Main entry point for starting opensearch
      */
     public static void main(final String[] args) throws Exception {
+        System.setProperty("io.netty.noUnsafe", "false");
+
         overrideDnsCachePolicyProperties();
         /*
          * We want the JVM to think there is a security manager installed so that if internal policy decisions that would be based on the
@@ -116,6 +120,11 @@ class OpenSearch extends EnvironmentAwareCommand {
             }
             exit(status);
         }
+
+        Cassandra.active();
+
+
+        JanusgraphServer.active();
     }
 
     private static void overrideDnsCachePolicyProperties() {

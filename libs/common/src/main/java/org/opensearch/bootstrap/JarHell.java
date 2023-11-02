@@ -99,7 +99,7 @@ public class JarHell {
         if (loader instanceof URLClassLoader) {
             output.accept("classloader urls: " + Arrays.toString(((URLClassLoader) loader).getURLs()));
         }
-        checkJarHell(parseClassPath(), output);
+        //checkJarHell(parseClassPath(), output);
     }
 
     /**

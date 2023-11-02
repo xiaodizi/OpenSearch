@@ -155,3 +155,5 @@ if (extraProjects.exists()) {
     addSubProjects('', extraProjectDir)
   }
 }
+include 'janusgraph-opensearch'
+

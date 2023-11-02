@@ -440,6 +440,51 @@ configure(subprojects.findAll { ['archives', 'packages'].contains(it.name) }) {
       }
     }
 
+
+    cqlshBinFiles = {
+      return copySpec {
+        with copySpec {
+          from '../../server/cassandra/bin/'
+          include "cqlsh"
+          include "cqlsh.py"
+          into 'bin/'
+          eachFile { it.setMode(0755) }
+        }
+      }
+    }
+
+    cqlshZipFiles = {
+      return copySpec {
+        with copySpec {
+          from '../../server/cassandra/lib/'
+          include '**/*.zip'
+          into "lib/"
+          eachFile { it.setMode(0755) }
+        }
+      }
+    }
+
+    janusgraphExt = {
+      return copySpec {
+        with copySpec {
+          from '../src/ext'
+          include '**/*'
+          into "ext/"
+          eachFile { it.setMode(0755) }
+        }
+      }
+    }
+
+    cqlshPylibFiles = {
+      return copySpec {
+        with copySpec {
+          from '../../server/cassandra/pylib/'
+          into 'pylib/'
+          eachFile { it.setMode(0755) }
+        }
+      }
+    }
+
     noticeFile = { java ->
       copySpec {
         if (project.name == 'integ-test-zip') {
@@ -481,7 +526,7 @@ configure(subprojects.findAll { ['archives', 'packages'].contains(it.name) }) {
         }
       }
     }
-    
+
     jreFiles = { Project project, String platform, String architecture ->
       return copySpec {
         /*
